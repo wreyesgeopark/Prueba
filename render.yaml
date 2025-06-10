@@ -5,8 +5,8 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: python main.py
     repo: https://github.com/wreyesgeopark/Prueba.git
-    branch: master
+    branch: main
     autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
-        value: 3.9.0 
+        value: 3.11.11 
