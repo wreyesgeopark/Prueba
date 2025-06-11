@@ -5,6 +5,7 @@ import os
 import openai
 from openai import OpenAI
 from typing import Optional
+import traceback
 
 print(f"OpenAI version: {openai.__version__}")
 
@@ -31,8 +32,14 @@ async def test_gpt(request: ChatRequest, x_api_key: Optional[str] = Header(None)
     try:
         # Verificar la API key
         expected_api_key = os.getenv("X_API_KEY")
-        if not x_api_key or x_api_key != expected_api_key:
-            raise HTTPException(status_code=401, detail="Invalid or missing X-API-KEY header")
+        if not expected_api_key:
+            raise HTTPException(status_code=500, detail="X_API_KEY not configured on server")
+            
+        if not x_api_key:
+            raise HTTPException(status_code=401, detail="X-API-KEY header is missing")
+            
+        if x_api_key != expected_api_key:
+            raise HTTPException(status_code=401, detail="Invalid X-API-KEY")
         
         # Verificar la OpenAI API key
         api_key = os.getenv("OPENAI_API_KEY")
@@ -48,7 +55,9 @@ async def test_gpt(request: ChatRequest, x_api_key: Optional[str] = Header(None)
         
         return {"message": completion.choices[0].message.content}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
+        error_details = f"Error: {str(e)}\n{traceback.format_exc()}"
+        print(error_details)  # Log error to server console
+        raise HTTPException(status_code=500, detail=error_details)
 
 if __name__ == "__main__":
     import uvicorn
