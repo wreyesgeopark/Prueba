@@ -11,4 +11,6 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.11
       - key: OPENAI_API_KEY
-        sync: false 
+        sync: false
+      - key: X_API_KEY
+        value: x-api-key-WivKXD5Rfw5iYqijpDSqm_4EL6pMcc3QXeR9ZBuPyWE9wtwI 

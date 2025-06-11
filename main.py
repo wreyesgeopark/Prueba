@@ -1,9 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
 import openai
 from openai import OpenAI
+from typing import Optional
 
 print(f"OpenAI version: {openai.__version__}")
 
@@ -26,8 +27,14 @@ def read_root():
     return {"status": "ok"}
 
 @app.post("/api/test-gpt")
-async def test_gpt(request: ChatRequest):
+async def test_gpt(request: ChatRequest, x_api_key: Optional[str] = Header(None)):
     try:
+        # Verificar la API key
+        expected_api_key = os.getenv("X_API_KEY")
+        if not x_api_key or x_api_key != expected_api_key:
+            raise HTTPException(status_code=401, detail="Invalid or missing X-API-KEY header")
+        
+        # Verificar la OpenAI API key
         api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise HTTPException(status_code=500, detail="OpenAI API key not found")
