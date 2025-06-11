@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
-import openai
+from openai import OpenAI
 
 class ChatRequest(BaseModel):
     message: str
@@ -29,9 +29,9 @@ async def test_gpt(request: ChatRequest):
         if not api_key:
             raise HTTPException(status_code=500, detail="OpenAI API key not found")
         
-        openai.api_key = api_key
+        client = OpenAI(api_key=api_key)
         
-        response = await openai.chat.completions.create(
+        response = await client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": request.message}]
         )
