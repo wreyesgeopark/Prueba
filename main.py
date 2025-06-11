@@ -2,7 +2,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import os
+import openai
 from openai import OpenAI
+
+print(f"OpenAI version: {openai.__version__}")
 
 class ChatRequest(BaseModel):
     message: str
@@ -31,14 +34,14 @@ async def test_gpt(request: ChatRequest):
         
         client = OpenAI(api_key=api_key)
         
-        response = await client.chat.completions.create(
+        completion = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": request.message}]
         )
         
-        return {"message": response.choices[0].message.content}
+        return {"message": completion.choices[0].message.content}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
